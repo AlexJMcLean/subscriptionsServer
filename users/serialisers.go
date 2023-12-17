@@ -1,6 +1,9 @@
 package users
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/AlexJMcLean/subscriptions/common"
+	"github.com/gin-gonic/gin"
+)
 
 type UserResponse struct {
 	Username string  `json:"username"`
