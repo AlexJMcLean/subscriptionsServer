@@ -32,4 +32,5 @@ func (u *UserModel) setPassword(password string) error {
 // if err := SaveOne(&userModel); err != nil {...}
 func SaveOne(data interface{}) error {
 	return nil
+	// TODO: add db connection
 }
