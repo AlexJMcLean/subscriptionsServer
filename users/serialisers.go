@@ -22,8 +22,6 @@ func (self *userSerialiser) Response() UserResponse {
 	user := UserResponse{
 		Username: myUserModel.Username,
 		Email: myUserModel.Email,
-		Bio: myUserModel.Bio,
-		Image: myUserModel.Image,
 		Token: common.GenToken(myUserModel.ID),
 	}
 	return user
