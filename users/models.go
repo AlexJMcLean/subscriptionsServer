@@ -39,3 +39,9 @@ func SaveOne(data interface{}) error {
 	return nil
 	// TODO: add db connection
 }
+
+func (u *UserModel) checkPassword(password string) error {
+	bytePassword := []byte(password)
+	byteHashedPassword := []byte(u.PasswordHash)
+	return bcrypt.CompareHashAndPassword(byteHashedPassword, bytePassword)
+}
