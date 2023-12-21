@@ -11,6 +11,10 @@ func UsersRegister(router *gin.RouterGroup) {
 	router.POST("/", UsersRegistration)
 }
 
+func UserRegister(router *gin.RouterGroup) {
+	router.GET("/", UserRetrieve)
+}
+
 func UsersRegistration(c *gin.Context) {
 	userModelValidator := NewUserModelValidator()
 
@@ -25,6 +29,11 @@ func UsersRegistration(c *gin.Context) {
 	}
 
 	c.Set("my_user_model", userModelValidator.userModel)
-	serialiser := userSerialiser{c}
+	serialiser := UserSerialiser{c}
 	c.JSON(http.StatusCreated, gin.H{"user": serialiser.Response()})
+}
+
+func UserRetrieve(c *gin.Context) {
+	serialiser := UserSerialiser{c}
+	c.JSON(http.StatusOK, gin.H{"user": serialiser.Response()})
 }

@@ -40,6 +40,10 @@ func UserModelMocker(n int) []UserModel {
 	return ret
 }
 
+func HeaderTokenMock(req *http.Request, u uint) {
+	req.Header.Set("Authorization", fmt.Sprintf("Token %v", common.GenToken(u)))
+}
+
 func TestUserModel(t *testing.T) {
 	asserts := assert.New(t)
 
@@ -130,6 +134,30 @@ var unauthRequestTests = []struct {
 		`{"errors":{"Email":"{key: email}"}}`,
 		"email invalid should return error",
 	},
+
+	{
+		func(req *http.Request) {
+			resetDBWithMock()
+			HeaderTokenMock(req, 1)
+		},
+		"/profiles/user1",
+		"GET",
+		``,
+		http.StatusOK,
+		`{"profile":{"username":"user1","bio":"bio1","image":"http://image/1.jpg","following":false}}`,
+		"request should return self profile",
+	},
+	{
+		func(req *http.Request) {
+			HeaderTokenMock(req, 2)
+		},
+		"/profiles/user1",
+		"GET",
+		``,
+		http.StatusOK,
+		`{"profile":{"username":"user1","bio":"bio1","image":"http://image/1.jpg","following":false}}`,
+		"request should return correct other's profile",
+	},
 }
 
 func TestWithoutAuth(t *testing.T) {
@@ -156,8 +184,8 @@ func TestWithoutAuth(t *testing.T) {
 
 }
 
-//This is a hack way to add test database for each case, as whole test will just share one database.
-//You can read TestWithoutAuth's comment to know how to not share database each case.
+// This is a hack way to add test database for each case, as whole test will just share one database.
+// You can read TestWithoutAuth's comment to know how to not share database each case.
 func TestMain(m *testing.M) {
 	test_db = common.TestDBInit()
 	AutoMigrate()

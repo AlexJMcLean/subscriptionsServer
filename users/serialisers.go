@@ -11,11 +11,11 @@ type UserResponse struct {
 	Token    string `json:"token"`
 }
 
-type userSerialiser struct {
+type UserSerialiser struct {
 	c *gin.Context
 }
 
-func (serialiser *userSerialiser) Response() UserResponse {
+func (serialiser *UserSerialiser) Response() UserResponse {
 	myUserModel := serialiser.c.MustGet("my_user_model").(UserModel)
 	user := UserResponse{
 		Username: myUserModel.Username,
