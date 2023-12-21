@@ -6,6 +6,7 @@ import (
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	"gorm.io/driver/postgres"
 )
 
 type Database struct {
@@ -15,7 +16,8 @@ type Database struct {
 var DB *gorm.DB
 
 func Init() *gorm.DB {
-	db, err := gorm.Open("sqlite3", "./../gorm.db")
+	dsn := "host=localhost user=user password=S3cret dbname=subscription_db port=5432 sslmode=disable TimeZone=Asia/Shanghai"
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Con)
 	if err != nil {
 		fmt.Println("db err: (Init)", err)
 	}
