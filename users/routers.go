@@ -8,11 +8,11 @@ import (
 )
 
 func UsersRegister(router *gin.RouterGroup) {
-	router.POST("/", usersRegistration)
+	router.POST("/", UsersRegistration)
 }
 
 
-func usersRegistration(c *gin.Context) {
+func UsersRegistration(c *gin.Context) {
 	userModelValidator := NewUserModelValidator()
 	
 	if err := userModelValidator.Bind(c); err != nil {

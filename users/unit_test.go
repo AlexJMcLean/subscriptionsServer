@@ -1,9 +1,15 @@
 package users
 
 import (
+	"bytes"
 	"fmt"
+	"net/http"
+	"net/http/httptest"
+	"os"
 	"testing"
 
+	"github.com/AlexJMcLean/subscriptions/common"
+	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/stretchr/testify/assert"
 )
@@ -55,4 +61,107 @@ func TestUserModel(t *testing.T) {
 
 	err = userModel.checkPassword("asd123!@#ASD")
 	asserts.NoError(err, "password should be checked and validated")
+}
+
+func resetDBWithMock() {
+	common.TestDBFree(test_db)
+	test_db = common.TestDBInit()
+	AutoMigrate()
+	UserModelMocker(3)
+}
+
+var unauthRequestTests = []struct {
+	init           func(*http.Request)
+	url            string
+	method         string
+	bodyData       string
+	expectedCode   int
+	responseRegexg string
+	msg            string
+}{
+	//Testing will run one by one, so you can combine it to a user story till another init().
+	//And you can modified the header or body in the func(req *http.Request) {}
+
+	//---------------------   Testing for user register   ---------------------
+	{
+		func(req *http.Request) {
+			resetDBWithMock()
+		},
+		"/users/",
+		"POST",
+		`{"user":{"username": "wangzitian0","email": "wzt@gg.cn","password": "jakejxke"}}`,
+		http.StatusCreated,
+		`{"user":{"username":"wangzitian0","email":"wzt@gg.cn","token":"([a-zA-Z0-9-_.]{115})"}}`,
+		"valid data and should return StatusCreated",
+	},
+	{
+		func(req *http.Request) {},
+		"/users/",
+		"POST",
+		`{"user":{"username": "wangzitian0","email": "wzt@gg.cn","password": "jakejxke"}}`,
+		http.StatusUnprocessableEntity,
+		`{"errors":{"database":"UNIQUE constraint failed: user_models.email"}}`,
+		"duplicated data and should return StatusUnprocessableEntity",
+	},
+	{
+		func(req *http.Request) {},
+		"/users/",
+		"POST",
+		`{"user":{"username": "u","email": "wzt@gg.cn","password": "jakejxke"}}`,
+		http.StatusUnprocessableEntity,
+		`{"errors":{"Username":"{min: 4}"}}`,
+		"too short username should return error",
+	},
+	{
+		func(req *http.Request) {},
+		"/users/",
+		"POST",
+		`{"user":{"username": "wangzitian0","email": "wzt@gg.cn","password": "j"}}`,
+		http.StatusUnprocessableEntity,
+		`{"errors":{"Password":"{min: 8}"}}`,
+		"too short password should return error",
+	},
+	{
+		func(req *http.Request) {},
+		"/users/",
+		"POST",
+		`{"user":{"username": "wangzitian0","email": "wztgg.cn","password": "jakejxke"}}`,
+		http.StatusUnprocessableEntity,
+		`{"errors":{"Email":"{key: email}"}}`,
+		"email invalid should return error",
+	},
+}
+
+func TestWithoutAuth(t *testing.T) {
+	asserts := assert.New(t)
+
+	r := gin.New()
+	UsersRegister(r.Group("/users"))
+
+	for _, testData := range unauthRequestTests {
+		bodyData := testData.bodyData
+		req, err := http.NewRequest(testData.method, testData.url, bytes.NewBufferString(bodyData))
+		req.Header.Set("Content-Type", "application/json")
+		asserts.NoError(err)
+
+		testData.init(req)
+
+		w := httptest.NewRecorder()
+		r.ServeHTTP(w, req)
+
+		asserts.Equal(testData.expectedCode, w.Code, "Response Status - "+testData.msg)
+		asserts.Regexp(testData.responseRegexg, w.Body.String(), "Response Content - "+testData.msg)
+
+	}
+
+}
+
+//This is a hack way to add test database for each case, as whole test will just share one database.
+//You can read TestWithoutAuth's comment to know how to not share database each case.
+func TestMain(m *testing.M) {
+	test_db = common.TestDBInit()
+	AutoMigrate()
+	exitVal := m.Run()
+	common.TestDBFree(test_db)
+	os.Exit(exitVal)
 }

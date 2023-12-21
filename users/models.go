@@ -36,8 +36,9 @@ func (u *UserModel) setPassword(password string) error {
 // Save UserModel to Db returns error information
 // if err := SaveOne(&userModel); err != nil {...}
 func SaveOne(data interface{}) error {
-	return nil
-	// TODO: add db connection
+	db := common.GetDB()
+	err := db.Save(data).Error
+	return err
 }
 
 func (u *UserModel) checkPassword(password string) error {

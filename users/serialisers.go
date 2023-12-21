@@ -8,8 +8,6 @@ import (
 type UserResponse struct {
 	Username string  `json:"username"`
 	Email    string  `json:"email"`
-	Bio      string  `json:"bio"`
-	Image    *string `json:"image"`
 	Token    string  `json:"token"`
 }
 
@@ -17,8 +15,8 @@ type userSerialiser struct {
 	c *gin.Context
 }
 
-func (self *userSerialiser) Response() UserResponse {
-	myUserModel := self.c.MustGet("my_user_model").(UserModel)
+func (serialiser *userSerialiser) Response() UserResponse {
+	myUserModel := serialiser.c.MustGet("my_user_model").(UserModel)
 	user := UserResponse{
 		Username: myUserModel.Username,
 		Email: myUserModel.Email,

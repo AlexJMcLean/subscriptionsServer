@@ -8,7 +8,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
-	"gopkg.in/go-playground/validator.v8"
+	"github.com/go-playground/validator/v10"
 )
 
 func Bind(c *gin.Context, obj interface{}) error {
@@ -26,10 +26,10 @@ func NewValidatorError(err error) CommonError {
 	res.Errors = make(map[string]interface{})
 	errs := err.(validator.ValidationErrors)
 	for _, v := range errs {
-		if v.Param != "" {
-			res.Errors[v.Field] = fmt.Sprintf("{%v: %v}", v.Tag, v.Param)
+		if v.Param() != "" {
+			res.Errors[v.Field()] = fmt.Sprintf("{%v: %v}", v.Tag(), v.Param())
 		} else {
-			res.Errors[v.Field] = fmt.Sprintf("{key: %v}", v.Tag)
+			res.Errors[v.Field()] = fmt.Sprintf("{key: %v}", v.Tag())
 		}
 	}
 	return res
@@ -46,7 +46,7 @@ func NewError(key string, err error) CommonError {
 // generate JWT token to be used in the request headers
 func GenToken(id uint) string {
 	NBSecretPassword, _ := os.LookupEnv("NBPASSWORD")
-	
+
 	jwt_token := jwt.New(jwt.GetSigningMethod("HS256"))
 	// Set some claims
 	jwt_token.Claims = jwt.MapClaims{
