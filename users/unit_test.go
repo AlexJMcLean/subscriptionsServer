@@ -18,9 +18,9 @@ var test_db *gorm.DB
 
 func newUserModel() UserModel {
 	return UserModel{
-		ID: 2,
-		Username: "abc123",
-		Email: "test@test.com",
+		ID:           2,
+		Username:     "abc123",
+		Email:        "test@test.com",
 		PasswordHash: "",
 	}
 }

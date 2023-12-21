@@ -8,9 +8,9 @@ import (
 )
 
 type UserModel struct {
-	ID uint `gorm:"primary_key"`
-	Username string `gorm:"column:username"`
-	Email string `gorm:"column:email;unique_index"`
+	ID           uint   `gorm:"primary_key"`
+	Username     string `gorm:"column:username"`
+	Email        string `gorm:"column:email;unique_index"`
 	PasswordHash string `gorm:"column:password;not null"`
 }
 
@@ -30,7 +30,7 @@ func (u *UserModel) setPassword(password string) error {
 
 	passwordHash, _ := bcrypt.GenerateFromPassword(bytePassword, bcrypt.DefaultCost)
 	u.PasswordHash = string(passwordHash)
-	return nil 
+	return nil
 }
 
 // Save UserModel to Db returns error information

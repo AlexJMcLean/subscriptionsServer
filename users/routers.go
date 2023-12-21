@@ -11,10 +11,9 @@ func UsersRegister(router *gin.RouterGroup) {
 	router.POST("/", UsersRegistration)
 }
 
-
 func UsersRegistration(c *gin.Context) {
 	userModelValidator := NewUserModelValidator()
-	
+
 	if err := userModelValidator.Bind(c); err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewValidatorError(err))
 		return

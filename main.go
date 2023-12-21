@@ -18,7 +18,7 @@ func main() {
 	defer db.Close()
 
 	r := gin.Default()
-	
+
 	v1 := r.Group("/api")
 	users.UsersRegister(v1.Group("/users"))
 

@@ -14,7 +14,7 @@ import (
 func Bind(c *gin.Context, obj interface{}) error {
 	b := binding.Default(c.Request.Method, c.ContentType())
 	return c.ShouldBindWith(obj, b)
-} 
+}
 
 type CommonError struct {
 	Errors map[string]interface{} `json:"errors"`
@@ -35,7 +35,7 @@ func NewValidatorError(err error) CommonError {
 	return res
 }
 
-// wrap the error info in an object 
+// wrap the error info in an object
 func NewError(key string, err error) CommonError {
 	res := CommonError{}
 	res.Errors = make(map[string]interface{})

@@ -22,7 +22,7 @@ func Init() *gorm.DB {
 	db.DB().SetMaxIdleConns(10)
 	DB = db
 	return DB
-} 
+}
 
 func GetDB() *gorm.DB {
 	return DB
