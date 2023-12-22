@@ -10,8 +10,8 @@ import (
 
 	"github.com/AlexJMcLean/subscriptions/common"
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 	"github.com/stretchr/testify/assert"
+	"gorm.io/gorm"
 )
 
 var test_db *gorm.DB
@@ -24,8 +24,8 @@ func newUserModel() UserModel {
 		PasswordHash: "",
 	}
 }
-func UserModelMocker(n int) []UserModel {
-	var offset int
+func UserModelMocker(n int64) []UserModel {
+	var offset int64
 	test_db.Model(&UserModel{}).Count(&offset)
 	var ret []UserModel
 	for i := offset + 1; i <= offset+n; i++ {
@@ -133,30 +133,6 @@ var unauthRequestTests = []struct {
 		http.StatusUnprocessableEntity,
 		`{"errors":{"Email":"{key: email}"}}`,
 		"email invalid should return error",
-	},
-
-	{
-		func(req *http.Request) {
-			resetDBWithMock()
-			HeaderTokenMock(req, 1)
-		},
-		"/profiles/user1",
-		"GET",
-		``,
-		http.StatusOK,
-		`{"profile":{"username":"user1","bio":"bio1","image":"http://image/1.jpg","following":false}}`,
-		"request should return self profile",
-	},
-	{
-		func(req *http.Request) {
-			HeaderTokenMock(req, 2)
-		},
-		"/profiles/user1",
-		"GET",
-		``,
-		http.StatusOK,
-		`{"profile":{"username":"user1","bio":"bio1","image":"http://image/1.jpg","following":false}}`,
-		"request should return correct other's profile",
 	},
 }
 

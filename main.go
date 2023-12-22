@@ -4,7 +4,7 @@ import (
 	"github.com/AlexJMcLean/subscriptions/common"
 	"github.com/AlexJMcLean/subscriptions/users"
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 func Migrate(db *gorm.DB) {
@@ -15,7 +15,6 @@ func main() {
 
 	db := common.Init()
 	Migrate(db)
-	defer db.Close()
 
 	r := gin.Default()
 

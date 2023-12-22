@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"gorm.io/driver/postgres"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 type Database struct {
@@ -17,11 +18,10 @@ var DB *gorm.DB
 
 func Init() *gorm.DB {
 	dsn := "host=localhost user=user password=S3cret dbname=subscription_db port=5432 sslmode=disable TimeZone=Asia/Shanghai"
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Con)
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		fmt.Println("db err: (Init)", err)
 	}
-	db.DB().SetMaxIdleConns(10)
 	DB = db
 	return DB
 }
@@ -32,19 +32,17 @@ func GetDB() *gorm.DB {
 
 // This function will create a temporarily database for running testing cases
 func TestDBInit() *gorm.DB {
-	test_db, err := gorm.Open("sqlite3", "./../gorm_test.db")
+	test_db, err := gorm.Open(sqlite.Open("../gorm.db"), &gorm.Config{})
 	if err != nil {
 		fmt.Println("db err: (testDBInit) ", err)
 	}
-	test_db.DB().SetMaxIdleConns(3)
-	test_db.LogMode(true)
+	test_db.Logger.LogMode(logger.Info)
 	DB = test_db
 	return DB
 }
 
 // Delete the database after running testing cases.
 func TestDBFree(test_db *gorm.DB) error {
-	test_db.Close()
-	err := os.Remove("./../gorm_test.db")
+	err := os.Remove("./../gorm.db")
 	return err
 }

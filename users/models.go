@@ -10,7 +10,7 @@ import (
 type UserModel struct {
 	ID           uint   `gorm:"primary_key"`
 	Username     string `gorm:"column:username"`
-	Email        string `gorm:"column:email;unique_index"`
+	Email        string `gorm:"column:email;uniqueindex"`
 	PasswordHash string `gorm:"column:password;not null"`
 }
 
@@ -37,7 +37,7 @@ func (u *UserModel) setPassword(password string) error {
 // if err := SaveOne(&userModel); err != nil {...}
 func SaveOne(data interface{}) error {
 	db := common.GetDB()
-	err := db.Save(data).Error
+	err := db.Create(data).Error
 	return err
 }
 
