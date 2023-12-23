@@ -11,6 +11,8 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
+var NBSecretPassword, _ = os.LookupEnv("NBPASSWORD")
+
 func Bind(c *gin.Context, obj interface{}) error {
 	b := binding.Default(c.Request.Method, c.ContentType())
 	return c.ShouldBindWith(obj, b)
@@ -45,7 +47,6 @@ func NewError(key string, err error) CommonError {
 
 // generate JWT token to be used in the request headers
 func GenToken(id uint) string {
-	NBSecretPassword, _ := os.LookupEnv("NBPASSWORD")
 
 	jwt_token := jwt.New(jwt.GetSigningMethod("HS256"))
 	// Set some claims

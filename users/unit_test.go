@@ -134,6 +134,41 @@ var unauthRequestTests = []struct {
 		`{"errors":{"Email":"{key: email}"}}`,
 		"email invalid should return error",
 	},
+
+
+	{
+		func(req *http.Request) {
+			resetDBWithMock()
+		},
+		"/user/",
+		"GET",
+		``,
+		http.StatusUnauthorized,
+		``,
+		"request should return 401 without token",
+	},
+	{
+		func(req *http.Request) {
+			req.Header.Set("Authorization", fmt.Sprintf("Tokee %v", common.GenToken(1)))
+		},
+		"/user/",
+		"GET",
+		``,
+		http.StatusUnauthorized,
+		``,
+		"wrong token should return 401",
+	},
+	{
+		func(req *http.Request) {
+			HeaderTokenMock(req, 1)
+		},
+		"/user/",
+		"GET",
+		``,
+		http.StatusOK,
+		`{"user":{"username":"user1","email":"user1@linkedin.com","token":"([a-zA-Z0-9-_.]{115})"}}`,
+		"request should return current user with token",
+	},
 }
 
 func TestWithoutAuth(t *testing.T) {
@@ -141,6 +176,8 @@ func TestWithoutAuth(t *testing.T) {
 
 	r := gin.New()
 	UsersRegister(r.Group("/users"))
+	r.Use(AuthMiddleware(true))
+	UserRegister(r.Group("/user"))
 
 	for _, testData := range unauthRequestTests {
 		bodyData := testData.bodyData

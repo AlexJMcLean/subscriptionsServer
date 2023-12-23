@@ -28,7 +28,7 @@ func UsersRegistration(c *gin.Context) {
 		return
 	}
 
-	c.Set("my_user_model", userModelValidator.userModel)
+	c.Set("user_model", userModelValidator.userModel)
 	serialiser := UserSerialiser{c}
 	c.JSON(http.StatusCreated, gin.H{"user": serialiser.Response()})
 }
