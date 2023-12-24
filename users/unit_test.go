@@ -24,6 +24,9 @@ func newUserModel() UserModel {
 		PasswordHash: "",
 	}
 }
+
+// Creates n users and adds them into the test_db
+// Param n => num of users to add to db
 func UserModelMocker(n int64) []UserModel {
 	var offset int64
 	test_db.Model(&UserModel{}).Count(&offset)
