@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 
-	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -17,8 +16,7 @@ type Database struct {
 var DB *gorm.DB
 
 func Init() *gorm.DB {
-	dsn := "host=localhost user=user password=S3cret dbname=subscription_db port=5432 sslmode=disable TimeZone=Asia/Shanghai"
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	db, err := gorm.Open(sqlite.Open("../database.db"), &gorm.Config{})
 	if err != nil {
 		fmt.Println("db err: (Init)", err)
 	}
