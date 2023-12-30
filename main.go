@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/AlexJMcLean/subscriptions/common"
+	"github.com/AlexJMcLean/subscriptions/products"
 	"github.com/AlexJMcLean/subscriptions/users"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -12,6 +13,7 @@ import (
 
 func Migrate(db *gorm.DB) {
 	users.AutoMigrate()
+	products.AutoMigrateProduct()
 }
 
 func main() {
