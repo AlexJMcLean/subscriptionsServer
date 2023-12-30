@@ -9,7 +9,18 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - data:/var/lib/postgresql/data
+      - pg-data:/var/lib/postgresql/data
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin4_container
+    restart: always
+    ports:
+      - "8888:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: user@user.com
+      PGADMIN_DEFAULT_PASSWORD: password
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
   server:
     build:
       context: .
@@ -22,4 +33,5 @@ services:
     ports:
       - "8080:8080"
 volumes:
-  data:
+  pg-data:
+  pgadmin-data:
