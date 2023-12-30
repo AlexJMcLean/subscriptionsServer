@@ -30,7 +30,7 @@ func main() {
 	r := gin.Default()
 
 	v1 := r.Group("/api")
-	products.ProductsRegister(v1.Group("/products"))
+	products.ProductsRegister(v1.Group("/product"))
 
 	r.Run()
 }
