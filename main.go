@@ -30,10 +30,7 @@ func main() {
 	r := gin.Default()
 
 	v1 := r.Group("/api")
-	users.UsersRegister(v1.Group("/users"))
-
-	v1.Use(users.AuthMiddleware(true))
-	users.UserRegister(v1.Group("/user"))
+	products.ProductsRegister(v1.Group("/products"))
 
 	r.Run()
 }
