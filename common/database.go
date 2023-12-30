@@ -16,14 +16,21 @@ type Database struct {
 
 var DB *gorm.DB
 
-func Init() *gorm.DB {
-	dsn := "host=localhost user=user password=S3cret dbname=subscription_db port=5432 sslmode=disable TimeZone=Asia/Shanghai"
+const (
+	HOST = "database"
+	PORT = 5432
+)
+
+func Init(username, password, database string) (*gorm.DB, error) {
+	
+	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+	HOST, PORT, username, password, database)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		fmt.Println("db err: (Init)", err)
+		return db, err
 	}
 	DB = db
-	return DB
+	return DB, nil
 }
 
 func GetDB() *gorm.DB {
