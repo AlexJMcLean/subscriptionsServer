@@ -1,6 +1,9 @@
 package main
 
 import (
+	"log"
+	"os"
+
 	"github.com/AlexJMcLean/subscriptions/common"
 	"github.com/AlexJMcLean/subscriptions/users"
 	"github.com/gin-gonic/gin"
@@ -12,8 +15,14 @@ func Migrate(db *gorm.DB) {
 }
 
 func main() {
-
-	db := common.Init()
+	dbUser, dbPassword, dbName :=
+        os.Getenv("POSTGRES_USER"),
+        os.Getenv("POSTGRES_PASSWORD"),
+        os.Getenv("POSTGRES_DB")
+	db, err := common.Init(dbUser, dbPassword, dbName)
+	if err != nil {
+		log.Fatalf("Could not set up database: %v", err)
+	}
 	Migrate(db)
 
 	r := gin.Default()

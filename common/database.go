@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -15,13 +16,21 @@ type Database struct {
 
 var DB *gorm.DB
 
-func Init() *gorm.DB {
-	db, err := gorm.Open(sqlite.Open("../database.db"), &gorm.Config{})
+const (
+	HOST = "database"
+	PORT = 5432
+)
+
+func Init(username, password, database string) (*gorm.DB, error) {
+	
+	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+	HOST, PORT, username, password, database)
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		fmt.Println("db err: (Init)", err)
+		return db, err
 	}
 	DB = db
-	return DB
+	return DB, nil
 }
 
 func GetDB() *gorm.DB {
