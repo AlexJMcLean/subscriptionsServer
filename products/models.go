@@ -19,3 +19,15 @@ func SaveProduct(data *ProductModel) error {
 	err := db.Create(data).Error
 	return err
 }
+
+func FindAllProducts() ([]ProductModel, error) {
+	db := common.GetDB()
+	var products []ProductModel
+	
+	tx := db.Begin()
+	result := tx.Find(&products)
+
+	err := result.Error
+
+	return products, err
+}

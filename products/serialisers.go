@@ -9,15 +9,31 @@ type ProductResponse struct {
 }
 
 type ProductSerialiser struct {
-	c *gin.Context
+	C *gin.Context
+	ProductModel
 }
 
 func (serialiser *ProductSerialiser) Response() ProductResponse {
-	productModel := serialiser.c.MustGet("product_model").(ProductModel)
 	product := ProductResponse{ 
-		Name: productModel.Name,
-		Price: productModel.Price,
-		Reference: productModel.Reference,
+		Name: serialiser.Name,
+		Price: serialiser.Price,
+		Reference: serialiser.Reference,
 	}
 	return product
+}
+
+type ProductsSerialiser struct {
+	C *gin.Context
+	Products []ProductModel
+}
+
+func (s ProductsSerialiser) Response() []ProductResponse {
+	response := []ProductResponse{}
+
+	for _, product := range s.Products {
+		serialiser := ProductSerialiser{s.C, product}
+		response = append(response, serialiser.Response())
+	}
+
+	return response
 }

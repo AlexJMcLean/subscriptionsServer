@@ -23,7 +23,7 @@ func ProductModelMocker(n int64) []ProductModel {
 	var ret []ProductModel
 	for i := offset + 1; i <= offset+n; i++ {
 		productModel := ProductModel{
-			Name: fmt.Sprintf("Productr%v", i),
+			Name: fmt.Sprintf("Product%v", i),
 			Price: 1.99,
 			Reference: fmt.Sprintf("PRODUCT%v", i),
 		}
@@ -33,11 +33,13 @@ func ProductModelMocker(n int64) []ProductModel {
 	return ret
 }
 
-func resetDBWithMock() {
+// resests DB with i prducts
+// @Param i = number of products to populate DB with
+func resetDBWithMock(i int64) {
 	common.TestDBFree(test_db)
 	test_db = common.TestDBInit()
 	AutoMigrateProduct()
-	ProductModelMocker(3)
+	ProductModelMocker(i)
 }
 
 var CreateProducts = []struct {
@@ -51,7 +53,7 @@ var CreateProducts = []struct {
 }{
 	{
 		func(req *http.Request) {
-			resetDBWithMock()
+			resetDBWithMock(1)
 		},
 		"/product/",
 		"POST",
@@ -60,11 +62,23 @@ var CreateProducts = []struct {
 		`{"product":{"name":"TestProduct","price":2.99,"reference":"TESTPRODUCT"}}`,
 		"valid data and should return StatusCreated",
 	},
+
+	{
+		func(req *http.Request) {
+			resetDBWithMock(2)
+		},
+		"/product/",
+		"GET",
+		``,
+		http.StatusOK,
+		`{"products":[{"name":"Product1","price":1.99,"reference":"PRODUCT1"},{"name":"Product2","price":1.99,"reference":"PRODUCT2"}]}`,
+		"valid data returned and should return StatusOK",
+	},
 }
 
-func TestCreateProduct(t *testing.T) {
+func TestProductEndpoint(t *testing.T) {
 	asserts := assert.New(t)
-
+	
 	r := gin.New()
 	ProductsRegister(r.Group("/product"))
 	
@@ -73,13 +87,15 @@ func TestCreateProduct(t *testing.T) {
 		req, err := http.NewRequest(testData.method, testData.url, bytes.NewBufferString(bodyData))
 		req.Header.Set("Content-Type", "application/json")
 		asserts.NoError(err)
-
+		
 		testData.init(req)
+		defer common.TestDBFree(test_db)
 
 		w := httptest.NewRecorder()
 		r.ServeHTTP(w, req)
 
 		asserts.Equal(testData.expectedCode, w.Code, "Response Status - "+testData.msg)
-		asserts.Regexp(testData.responseRegexg, w.Body.String(), "Response Content - "+testData.msg)
+
+		asserts.Equal(testData.responseRegexg, w.Body.String(), "Response Content - "+testData.msg)
 	}
 }

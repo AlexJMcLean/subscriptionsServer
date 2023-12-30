@@ -1,6 +1,7 @@
 package products
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/AlexJMcLean/subscriptions/common"
@@ -9,7 +10,7 @@ import (
 
 func ProductsRegister(router *gin.RouterGroup) {
 	router.POST("/", CreateProduct)
-	router.GET("/", GetProduct)
+	router.GET("/", GetProductList)
 }
 
 func CreateProduct (c *gin.Context) {
@@ -25,10 +26,16 @@ func CreateProduct (c *gin.Context) {
 	}
 
 	c.Set("product_model", productModelValidator.productModel)
-	serialiser := ProductSerialiser{c}
+	serialiser := ProductSerialiser{c, productModelValidator.productModel}
 	c.JSON(http.StatusCreated, gin.H{"product": serialiser.Response()})
 }
 
-func GetProduct (c *gin.Context) {
-	// TODO implement Get Product	
+func GetProductList (c *gin.Context) {
+	productModels, err := FindAllProducts()
+	if err != nil {
+		c.JSON(http.StatusNotFound, common.NewError("products", errors.New("no products found")))
+		return
+	}
+	serialiser := ProductsSerialiser{c, productModels}
+	c.JSON(http.StatusOK, gin.H{"products": serialiser.Response()})
 }
